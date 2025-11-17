@@ -1,7 +1,7 @@
 const CACHE_NAME = "lipomix-cache-v1";
 const URLS_TO_CACHE = [
     "./",
-    "./lipid_calculator.html",
+    "./index.html",
     "./manifest.json",
     "./icon-192.png",
     "./icon-512.png"
