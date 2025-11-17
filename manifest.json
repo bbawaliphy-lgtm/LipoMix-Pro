@@ -1,7 +1,7 @@
 {
   "name": "LipoMix Pro",
   "short_name": "LipoMix",
-  "start_url": "./lipid_calculator.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -20,3 +20,4 @@
     }
   ]
 }
+
