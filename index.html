@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LipoMix Pro - Lipid Solution Calculator</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#667eea">
 
-    <!-- iOS support -->
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- iOS support -->
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./service-worker.js")
-            .then(() => console.log("Service Worker Registered"))
-            .catch(err => console.error("Service Worker registration failed:", err));
-        }
-    </script>
+<script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.js")
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.error("Service Worker registration failed:", err));
+    }
+</script>
 
     <style>
         * {
@@ -29,6 +29,609 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .lipid-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .add-lipid-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .add-lipid-btn:hover {
+            background: #5568d3;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .chloroform-result {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .add-lipid-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .add-lipid-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: end;
+        }
+
+        .save-lipid-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .save-lipid-btn:hover {
+            background: #1976d2;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .lipid-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<!-- New Navigation Tab -->
+<div class="tab-container" style="display:flex; gap:10px; margin:20px 0;">
+    <button class="tab-btn" onclick="document.getElementById('main-app').style.display='block'; document.getElementById('merged-app').style.display='none';">
+        Main App
+    </button>
+    <button class="tab-btn" onclick="document.getElementById('main-app').style.display='none'; document.getElementById('merged-app').style.display='block';">
+        LipoMix Merged
+    </button>
+</div>
+
+<div id="main-app" style="display:block;">
+
+        <div style="text-align: center; margin-bottom: 10px;">
+    <div style="
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 12px;
+    ">
+        <img src="icon-192.png" 
+             alt="LipoMix Logo" 
+             style="width: 42px; height: 42px; border-radius: 10px;">
+        <h1 style="margin: 0; font-size: 1.9em; color: #333;">
+            LipoMix Pro
+        </h1>
+    </div>
+
+    <p style="
+        margin-top: 6px; 
+        font-size: 0.85em; 
+        color: #555;
+        font-weight: 500;
+    ">
+        An Initiative by Jaydeep Kumar Basu's Lab, Department of Physics, IISc Bangalore
+    </p>
+</div>
+
+
+        <p class="subtitle">Professional Lipid's Volume Calculator for Membrane Preparation</p>
+
+        <div class="section">
+            <div class="section-title">Solution Parameters</div>
+            <div class="input-group">
+                <label>Total Volume (μL)</label>
+                <input type="number" id="totalVolume" value="1000" min="1">
+            </div>
+            <div class="input-group">
+                <label>Total Lipid Concentration (mg/mL)</label>
+                <input type="number" id="concentration" value="1" step="0.1" min="0.1">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Lipid Components</div>
+            <div id="lipidRows"></div>
+            <button class="add-lipid-btn" onclick="addLipidRow()">+ Add Lipid</button>
+            
+            <div class="add-lipid-section">
+                <div style="font-weight: 600; color: #1976d2; margin-bottom: 10px;">➕ Register New Lipid</div>
+                <div class="add-lipid-form">
+                    <div class="input-group">
+                        <label>Lipid Name</label>
+                        <input type="text" id="newLipidName" placeholder="e.g., DSPC">
+                    </div>
+                    <div class="input-group">
+                        <label>MW (g/mol)</label>
+                        <input type="number" id="newLipidMW" step="0.001" placeholder="e.g., 790.145">
+                    </div>
+                    <button class="save-lipid-btn" onclick="saveNewLipid()">Save Lipid</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">Calculate Volumes</button>
+
+        <div class="error" id="error"></div>
+        <div class="results" id="results"></div>
+    </div>
+
+    <footer>
+        <p>© 2024 LipoMix Pro | Developed by <a href="#">Biplab Bawali</a></p>
+        <p style="font-size: 0.85em; margin-top: 5px; opacity: 0.9;">All rights reserved</p>
+    </footer>
+
+    <script>
+        // Load lipids from localStorage or use defaults
+        function loadLipidDatabase() {
+            const savedLipids = localStorage.getItem('lipidDatabase');
+            if (savedLipids) {
+                return JSON.parse(savedLipids);
+            }
+            // Default lipid database
+            return {
+                'Egg PC': 770.00,
+                'POPE': 718.00,
+                'Brain PS': 824.966,
+                'Liver PI': 902.113,
+                'Cholesterol': 386.65,
+                'DGS-NTA Ni': 1004.94,
+                'DOPC': 786.11,
+                'DPPC': 734.04,
+                'POPC': 760.08,
+                'DOPE': 744.03,
+                'Sphingomyelin': 703.00,
+                'Cardiolipin': 1447.97
+            };
+        }
+
+        // Save lipid database to localStorage
+        function saveLipidDatabase(database) {
+            localStorage.setItem('lipidDatabase', JSON.stringify(database));
+        }
+
+        let lipidDatabase = loadLipidDatabase();
+        let lipidCount = 0;
+
+        function saveNewLipid() {
+            const name = document.getElementById('newLipidName').value.trim();
+            const mw = parseFloat(document.getElementById('newLipidMW').value);
+
+            if (!name || !mw || mw <= 0) {
+                alert('Please enter valid lipid name and molecular weight.');
+                return;
+            }
+
+            if (lipidDatabase[name]) {
+                if (!confirm(`Lipid "${name}" already exists with MW ${lipidDatabase[name]}. Do you want to update it?`)) {
+                    return;
+                }
+            }
+
+            lipidDatabase[name] = mw;
+            saveLipidDatabase(lipidDatabase);
+
+            document.getElementById('newLipidName').value = '';
+            document.getElementById('newLipidMW').value = '';
+
+            alert(`Lipid "${name}" saved successfully!`);
+            
+            // Refresh all lipid dropdowns
+            updateAllLipidDropdowns();
+        }
+
+        function updateAllLipidDropdowns() {
+            const selects = document.querySelectorAll('.lipid-select');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = getLipidOptions();
+                select.value = currentValue;
+            });
+        }
+
+        function getLipidOptions() {
+            let options = '<option value="">Select Lipid</option>';
+            // Sort lipids alphabetically
+            const sortedLipids = Object.keys(lipidDatabase).sort();
+            for (let lipid of sortedLipids) {
+                options += `<option value="${lipid}">${lipid} (MW: ${lipidDatabase[lipid]})</option>`;
+            }
+            return options;
+        }
+
+        function addLipidRow() {
+            lipidCount++;
+            const container = document.getElementById('lipidRows');
+            const row = document.createElement('div');
+            row.className = 'lipid-row';
+            row.id = `lipid-${lipidCount}`;
+
+            row.innerHTML = `
+                <div class="input-group">
+                    <label>Lipid</label>
+                    <select class="lipid-select" data-id="${lipidCount}">${getLipidOptions()}</select>
+                </div>
+                <div class="input-group">
+                    <label>Stock (mg/mL)</label>
+                    <input type="number" class="stock-conc" data-id="${lipidCount}" step="0.01" min="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Molar Fraction</label>
+                    <input type="number" class="molar-fraction" data-id="${lipidCount}" step="0.01" min="0" max="1">
+                </div>
+                <button class="remove-btn" onclick="removeLipidRow(${lipidCount})">Remove</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeLipidRow(id) {
+            const row = document.getElementById(`lipid-${id}`);
+            if (row) row.remove();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function calculate() {
+            hideError();
+
+            // Get solution parameters
+            const totalVolume = parseFloat(document.getElementById('totalVolume').value);
+            const concentration = parseFloat(document.getElementById('concentration').value);
+
+            if (!totalVolume || !concentration) {
+                showError('Please enter valid solution parameters.');
+                return;
+            }
+
+            // Get all lipid data
+            const lipids = [];
+            const lipidSelects = document.querySelectorAll('.lipid-select');
+            
+            lipidSelects.forEach(select => {
+                const id = select.dataset.id;
+                const lipidName = select.value;
+                const stockConc = parseFloat(document.querySelector(`.stock-conc[data-id="${id}"]`).value);
+                const molarFraction = parseFloat(document.querySelector(`.molar-fraction[data-id="${id}"]`).value);
+
+                if (lipidName && stockConc && molarFraction) {
+                    lipids.push({
+                        name: lipidName,
+                        mw: lipidDatabase[lipidName],
+                        stockConc: stockConc,
+                        molarFraction: molarFraction
+                    });
+                }
+            });
+
+            if (lipids.length === 0) {
+                showError('Please add at least one lipid with all required information.');
+                return;
+            }
+
+            // Validate molar fractions sum to 1
+            const totalFraction = lipids.reduce((sum, l) => sum + l.molarFraction, 0);
+            if (Math.abs(totalFraction - 1.0) > 0.001) {
+                showError(`Molar fractions must sum to 1.0 (current sum: ${totalFraction.toFixed(3)})`);
+                return;
+            }
+
+            // Calculate average MW
+            const avgMW = lipids.reduce((sum, l) => sum + (l.molarFraction * l.mw), 0);
+
+            // Step 1: Total mass in mg
+            // concentration is mg/mL, totalVolume is μL
+            // mass (mg) = concentration (mg/mL) * volume (mL)
+            // Convert μL to mL: 1000 μL = 1 mL
+            const totalMassMg = concentration * (totalVolume / 1000); // in mg
+            const totalMassUg = totalMassMg * 1000; // in μg
+
+            // Step 2: Total moles in μmol
+            // moles = mass / MW
+            // mass is in mg, MW is in g/mol (= mg/mmol)
+            // so: moles (mmol) = mass (mg) / MW (mg/mmol)
+            // 1 mmol = 1000 μmol
+            const totalMolesMmol = totalMassMg / avgMW; // in mmol
+            const totalMoles = totalMolesMmol * 1000; // in μmol
+
+            // Step 3: Calculate volumes for each lipid
+            const results = lipids.map(lipid => {
+                // Moles of this lipid in μmol
+                const moles = lipid.molarFraction * totalMoles; // in μmol
+                
+                // Mass of this lipid in μg
+                // moles (μmol) * MW (g/mol) = μmol * g/mol = (μmol/1000) * (g/mol) * 1000 = μg
+                const molesInMmol = moles / 1000; // convert μmol to mmol
+                const massInMg = molesInMmol * lipid.mw; // mmol * g/mol = mg
+                const mass = massInMg * 1000; // convert mg to μg
+                
+                // Volume from stock in μL
+                // We need volume such that: volume (μL) * concentration (mg/mL) = mass (mg)
+                // volume (μL) = mass (mg) / concentration (mg/mL) * 1000
+                // Because: (mg) / (mg/mL) = mL, and mL * 1000 = μL
+                const volumeInMl = massInMg / lipid.stockConc; // in mL
+                const volume = volumeInMl * 1000; // in μL
+                
+                return {
+                    name: lipid.name,
+                    moles: moles,
+                    mass: mass,
+                    volume: volume
+                };
+            });
+
+            // Calculate chloroform volume
+            const totalLipidVolume = results.reduce((sum, r) => sum + r.volume, 0);
+            const chloroformVolume = totalVolume - totalLipidVolume;
+
+            // Display results
+            displayResults(results, chloroformVolume, totalLipidVolume, avgMW);
+        }
+
+        function displayResults(lipidResults, chloroformVolume, totalLipidVolume, avgMW) {
+            const resultsDiv = document.getElementById('results');
+            let html = '<div class="section-title">📊 Calculated Volumes</div>';
+            
+            html += `<div class="result-item">
+                <span class="result-label">Average Molecular Weight:</span>
+                <span class="result-value">${avgMW.toFixed(2)} g/mol</span>
+            </div>`;
+
+            lipidResults.forEach(result => {
+                html += `<div class="result-item">
+                    <span class="result-label">${result.name}:</span>
+                    <span class="result-value">${result.volume.toFixed(1)} μL</span>
+                </div>`;
+            });
+
+            html += `<div class="result-item">
+                <span class="result-label">Total Lipid Stock Volume:</span>
+                <span class="result-value">${totalLipidVolume.toFixed(1)} μL</span>
+            </div>`;
+
+            html += `<div class="result-item chloroform-result">
+                <span class="result-label">Chloroform:</span>
+                <span class="result-value">${chloroformVolume.toFixed(1)} μL</span>
+            </div>`;
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+
+        // Initialize with one lipid row
+        addLipidRow();
+    </script>
+
+</div> <!-- end main-app -->
+
+<div id="merged-app" style="display:none;">
+    <h2 style="text-align:center; margin-bottom:20px;">LipoMix Merged Application</h2>
+    <iframe style="width:100%; height:1400px; border:none;" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;LipoMix Pro - Lipid Solution Calculator&lt;/title&gt;
+    &lt;link rel=&quot;manifest&quot; href=&quot;manifest.json&quot;&gt;
+    &lt;meta name=&quot;theme-color&quot; content=&quot;#667eea&quot;&gt;
+
+    &lt;!-- iOS support --&gt;
+    &lt;link rel=&quot;apple-touch-icon&quot; href=&quot;icon-192.png&quot;&gt;
+    &lt;meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;&gt;
+    &lt;meta name=&quot;apple-mobile-web-app-status-bar-style&quot; content=&quot;black-translucent&quot;&gt;
+
+    &lt;script&gt;
+        if (&quot;serviceWorker&quot; in navigator) {
+            navigator.serviceWorker.register(&quot;./service-worker.js&quot;)
+            .then(() =&gt; console.log(&quot;Service Worker Registered&quot;))
+            .catch(err =&gt; console.error(&quot;Service Worker registration failed:&quot;, err));
+        }
+    &lt;/script&gt;
+
+    &lt;style&gt;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: &#x27;Segoe UI&#x27;, Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
@@ -291,7 +894,7 @@
             margin-top: 10px;
         }
 
-        .checkbox-group input[type="checkbox"] {
+        .checkbox-group input[type=&quot;checkbox&quot;] {
             width: auto;
             cursor: pointer;
         }
@@ -411,251 +1014,251 @@
                 padding: 8px;
             }
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div style="text-align: center; margin-bottom: 10px;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                <img src="icon-192.png" alt="LipoMix Logo" style="width: 42px; height: 42px; border-radius: 10px;">
-                <h1 style="margin: 0; font-size: 1.9em; color: #333;">LipoMix Pro</h1>
-            </div>
-            <p style="margin-top: 6px; font-size: 0.85em; color: #555; font-weight: 500;">
-                An Initiative by Jaydeep Kumar Basu's Lab, Department of Physics, IISc Bangalore
-            </p>
-        </div>
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div style=&quot;text-align: center; margin-bottom: 10px;&quot;&gt;
+            &lt;div style=&quot;display: flex; align-items: center; justify-content: center; gap: 12px;&quot;&gt;
+                &lt;img src=&quot;icon-192.png&quot; alt=&quot;LipoMix Logo&quot; style=&quot;width: 42px; height: 42px; border-radius: 10px;&quot;&gt;
+                &lt;h1 style=&quot;margin: 0; font-size: 1.9em; color: #333;&quot;&gt;LipoMix Pro&lt;/h1&gt;
+            &lt;/div&gt;
+            &lt;p style=&quot;margin-top: 6px; font-size: 0.85em; color: #555; font-weight: 500;&quot;&gt;
+                An Initiative by Jaydeep Kumar Basu&#x27;s Lab, Department of Physics, IISc Bangalore
+            &lt;/p&gt;
+        &lt;/div&gt;
 
-        <!-- Tab Navigation -->
-        <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('lipid-calculator')">
+        &lt;!-- Tab Navigation --&gt;
+        &lt;div class=&quot;tab-container&quot;&gt;
+            &lt;button class=&quot;tab-btn active&quot; onclick=&quot;switchTab(&#x27;lipid-calculator&#x27;)&quot;&gt;
                 🧪 Lipid Calculator
-            </button>
-            <button class="tab-btn" onclick="switchTab('protein-reconstitution')">
+            &lt;/button&gt;
+            &lt;button class=&quot;tab-btn&quot; onclick=&quot;switchTab(&#x27;protein-reconstitution&#x27;)&quot;&gt;
                 🧬 Protein Reconstitution
-            </button>
-        </div>
+            &lt;/button&gt;
+        &lt;/div&gt;
 
-        <!-- Tab 1: Lipid Calculator -->
-        <div id="lipid-calculator" class="tab-content active">
-            <p class="subtitle">Professional Lipid's Volume Calculator for Membrane Preparation</p>
+        &lt;!-- Tab 1: Lipid Calculator --&gt;
+        &lt;div id=&quot;lipid-calculator&quot; class=&quot;tab-content active&quot;&gt;
+            &lt;p class=&quot;subtitle&quot;&gt;Professional Lipid&#x27;s Volume Calculator for Membrane Preparation&lt;/p&gt;
 
-            <div class="section">
-                <div class="section-title">Solution Parameters</div>
-                <div class="input-group">
-                    <label>Total Volume (μL)</label>
-                    <input type="number" id="totalVolume" value="1000" min="1">
-                </div>
-                <div class="input-group">
-                    <label>Total Lipid Concentration (mg/mL)</label>
-                    <input type="number" id="concentration" value="1" step="0.1" min="0.1">
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Solution Parameters&lt;/div&gt;
+                &lt;div class=&quot;input-group&quot;&gt;
+                    &lt;label&gt;Total Volume (μL)&lt;/label&gt;
+                    &lt;input type=&quot;number&quot; id=&quot;totalVolume&quot; value=&quot;1000&quot; min=&quot;1&quot;&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;input-group&quot;&gt;
+                    &lt;label&gt;Total Lipid Concentration (mg/mL)&lt;/label&gt;
+                    &lt;input type=&quot;number&quot; id=&quot;concentration&quot; value=&quot;1&quot; step=&quot;0.1&quot; min=&quot;0.1&quot;&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <div class="section">
-                <div class="section-title">Lipid Components</div>
-                <div id="lipidRows"></div>
-                <button class="add-lipid-btn" onclick="addLipidRow()">+ Add Lipid</button>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Lipid Components&lt;/div&gt;
+                &lt;div id=&quot;lipidRows&quot;&gt;&lt;/div&gt;
+                &lt;button class=&quot;add-lipid-btn&quot; onclick=&quot;addLipidRow()&quot;&gt;+ Add Lipid&lt;/button&gt;
                 
-                <div class="add-lipid-section">
-                    <div style="font-weight: 600; color: #1976d2; margin-bottom: 10px;">➕ Register New Lipid</div>
-                    <div class="add-lipid-form">
-                        <div class="input-group">
-                            <label>Lipid Name</label>
-                            <input type="text" id="newLipidName" placeholder="e.g., DSPC">
-                        </div>
-                        <div class="input-group">
-                            <label>MW (g/mol)</label>
-                            <input type="number" id="newLipidMW" step="0.001" placeholder="e.g., 790.145">
-                        </div>
-                        <button class="save-lipid-btn" onclick="saveNewLipid()">Save Lipid</button>
-                    </div>
-                </div>
-            </div>
+                &lt;div class=&quot;add-lipid-section&quot;&gt;
+                    &lt;div style=&quot;font-weight: 600; color: #1976d2; margin-bottom: 10px;&quot;&gt;➕ Register New Lipid&lt;/div&gt;
+                    &lt;div class=&quot;add-lipid-form&quot;&gt;
+                        &lt;div class=&quot;input-group&quot;&gt;
+                            &lt;label&gt;Lipid Name&lt;/label&gt;
+                            &lt;input type=&quot;text&quot; id=&quot;newLipidName&quot; placeholder=&quot;e.g., DSPC&quot;&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;input-group&quot;&gt;
+                            &lt;label&gt;MW (g/mol)&lt;/label&gt;
+                            &lt;input type=&quot;number&quot; id=&quot;newLipidMW&quot; step=&quot;0.001&quot; placeholder=&quot;e.g., 790.145&quot;&gt;
+                        &lt;/div&gt;
+                        &lt;button class=&quot;save-lipid-btn&quot; onclick=&quot;saveNewLipid()&quot;&gt;Save Lipid&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <button class="calculate-btn" onclick="calculateLipidVolumes()">Calculate Volumes</button>
+            &lt;button class=&quot;calculate-btn&quot; onclick=&quot;calculateLipidVolumes()&quot;&gt;Calculate Volumes&lt;/button&gt;
 
-            <div class="error" id="error-lipid"></div>
-            <div class="results" id="results-lipid"></div>
-        </div>
+            &lt;div class=&quot;error&quot; id=&quot;error-lipid&quot;&gt;&lt;/div&gt;
+            &lt;div class=&quot;results&quot; id=&quot;results-lipid&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
 
-        <!-- Tab 2: Protein Reconstitution Calculator -->
-        <div id="protein-reconstitution" class="tab-content">
-            <p class="subtitle">Calculate protein stock concentrations for membrane reconstitution</p>
+        &lt;!-- Tab 2: Protein Reconstitution Calculator --&gt;
+        &lt;div id=&quot;protein-reconstitution&quot; class=&quot;tab-content&quot;&gt;
+            &lt;p class=&quot;subtitle&quot;&gt;Calculate protein stock concentrations for membrane reconstitution&lt;/p&gt;
 
-            <div class="section">
-                <div class="section-title">Lipid Parameters</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Lipid Type</label>
-                        <select id="lipidType" onchange="updateLipidMW()">
-                            <option value="742.3223">ERGIC (MW: 742.32 g/mol)</option>
-                            <option value="791.0573">PCPSPI (MW: 791.06 g/mol)</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Lipid MW (g/mol)</label>
-                        <input type="number" id="lipidMW" value="742.3223" step="0.0001" readonly>
-                    </div>
-                    <div class="input-group">
-                        <label>Lipid Stock Concentration (mg/mL)</label>
-                        <input type="number" id="lipidConc" value="1" step="0.01">
-                    </div>
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Lipid Parameters&lt;/div&gt;
+                &lt;div class=&quot;input-row&quot;&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid Type&lt;/label&gt;
+                        &lt;select id=&quot;lipidType&quot; onchange=&quot;updateLipidMW()&quot;&gt;
+                            &lt;option value=&quot;742.3223&quot;&gt;ERGIC (MW: 742.32 g/mol)&lt;/option&gt;
+                            &lt;option value=&quot;791.0573&quot;&gt;PCPSPI (MW: 791.06 g/mol)&lt;/option&gt;
+                        &lt;/select&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid MW (g/mol)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;lipidMW&quot; value=&quot;742.3223&quot; step=&quot;0.0001&quot; readonly&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid Stock Concentration (mg/mL)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;lipidConc&quot; value=&quot;1&quot; step=&quot;0.01&quot;&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <div class="section">
-                <div class="section-title">Volume Parameters</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Lipid Volume (μL)</label>
-                        <input type="number" id="lipidVolume" value="200" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label>N Protein Volume (μL)</label>
-                        <input type="number" id="nProteinVolume" value="40" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label>MCT Volume (μL)</label>
-                        <input type="number" id="mctVolume" value="50" step="1">
-                    </div>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="includeMCT" checked onchange="toggleMCT()">
-                    <label for="includeMCT">Include MCT Protein</label>
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Volume Parameters&lt;/div&gt;
+                &lt;div class=&quot;input-row&quot;&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid Volume (μL)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;lipidVolume&quot; value=&quot;200&quot; step=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;N Protein Volume (μL)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;nProteinVolume&quot; value=&quot;40&quot; step=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;MCT Volume (μL)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;mctVolume&quot; value=&quot;50&quot; step=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;checkbox-group&quot;&gt;
+                    &lt;input type=&quot;checkbox&quot; id=&quot;includeMCT&quot; checked onchange=&quot;toggleMCT()&quot;&gt;
+                    &lt;label for=&quot;includeMCT&quot;&gt;Include MCT Protein&lt;/label&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <div class="section">
-                <div class="section-title">Protein Parameters</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>N Protein MW (g/mol)</label>
-                        <input type="number" id="nProteinMW" value="52000" step="1">
-                    </div>
-                    <div class="input-group">
-                        <label>MCT Protein MW (g/mol)</label>
-                        <input type="number" id="mctMW" value="2651.77" step="0.01">
-                    </div>
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Protein Parameters&lt;/div&gt;
+                &lt;div class=&quot;input-row&quot;&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;N Protein MW (g/mol)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;nProteinMW&quot; value=&quot;52000&quot; step=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;MCT Protein MW (g/mol)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;mctMW&quot; value=&quot;2651.77&quot; step=&quot;0.01&quot;&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <div class="section">
-                <div class="section-title">Molecular Ratios</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Lipid : N Protein Ratio</label>
-                        <input type="number" id="lipidNRatio" value="3" step="1" min="1">
-                    </div>
-                    <div class="input-group">
-                        <label>Lipid : MCT Ratio</label>
-                        <input type="number" id="lipidMCTRatio" value="60" step="1" min="1">
-                    </div>
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Molecular Ratios&lt;/div&gt;
+                &lt;div class=&quot;input-row&quot;&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid : N Protein Ratio&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;lipidNRatio&quot; value=&quot;3&quot; step=&quot;1&quot; min=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Lipid : MCT Ratio&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;lipidMCTRatio&quot; value=&quot;60&quot; step=&quot;1&quot; min=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <div class="section">
-                <div class="section-title">Stock Solution Volume</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Stock Volume to Prepare (μL)</label>
-                        <input type="number" id="stockVolume" value="200" step="1">
-                    </div>
-                </div>
-            </div>
+            &lt;div class=&quot;section&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;Stock Solution Volume&lt;/div&gt;
+                &lt;div class=&quot;input-row&quot;&gt;
+                    &lt;div class=&quot;input-group&quot;&gt;
+                        &lt;label&gt;Stock Volume to Prepare (μL)&lt;/label&gt;
+                        &lt;input type=&quot;number&quot; id=&quot;stockVolume&quot; value=&quot;200&quot; step=&quot;1&quot;&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
 
-            <button class="calculate-btn" onclick="calculateProteinConcentrations()">Calculate Concentrations</button>
+            &lt;button class=&quot;calculate-btn&quot; onclick=&quot;calculateProteinConcentrations()&quot;&gt;Calculate Concentrations&lt;/button&gt;
 
-            <div class="error" id="error-protein"></div>
+            &lt;div class=&quot;error&quot; id=&quot;error-protein&quot;&gt;&lt;/div&gt;
 
-            <div class="results" id="results-protein">
-                <div class="section-title">📊 Results</div>
-                <div class="results-grid" id="resultsGrid"></div>
+            &lt;div class=&quot;results&quot; id=&quot;results-protein&quot;&gt;
+                &lt;div class=&quot;section-title&quot;&gt;📊 Results&lt;/div&gt;
+                &lt;div class=&quot;results-grid&quot; id=&quot;resultsGrid&quot;&gt;&lt;/div&gt;
                 
-                <div style="margin-top: 30px;">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Detailed Composition Table</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="resultsTable"></table>
-                    </div>
-                </div>
+                &lt;div style=&quot;margin-top: 30px;&quot;&gt;
+                    &lt;h3 style=&quot;color: #667eea; margin-bottom: 15px;&quot;&gt;Detailed Composition Table&lt;/h3&gt;
+                    &lt;div style=&quot;overflow-x: auto;&quot;&gt;
+                        &lt;table id=&quot;resultsTable&quot;&gt;&lt;/table&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
 
-                <div style="margin-top: 30px;">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Stock Preparation Instructions</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="stockTable"></table>
-                    </div>
-                </div>
+                &lt;div style=&quot;margin-top: 30px;&quot;&gt;
+                    &lt;h3 style=&quot;color: #667eea; margin-bottom: 15px;&quot;&gt;Stock Preparation Instructions&lt;/h3&gt;
+                    &lt;div style=&quot;overflow-x: auto;&quot;&gt;
+                        &lt;table id=&quot;stockTable&quot;&gt;&lt;/table&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
 
-                <div style="margin-top: 30px;">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Reconstitution Recipe</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="recipeTable"></table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                &lt;div style=&quot;margin-top: 30px;&quot;&gt;
+                    &lt;h3 style=&quot;color: #667eea; margin-bottom: 15px;&quot;&gt;Reconstitution Recipe&lt;/h3&gt;
+                    &lt;div style=&quot;overflow-x: auto;&quot;&gt;
+                        &lt;table id=&quot;recipeTable&quot;&gt;&lt;/table&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
 
-    <footer>
-        <p>© 2024 LipoMix Pro | Developed by <a href="#">Biplab Bawali</a></p>
-        <p style="font-size: 0.85em; margin-top: 5px; opacity: 0.9;">All rights reserved</p>
-    </footer>
+    &lt;footer&gt;
+        &lt;p&gt;© 2024 LipoMix Pro | Developed by &lt;a href=&quot;#&quot;&gt;Biplab Bawali&lt;/a&gt;&lt;/p&gt;
+        &lt;p style=&quot;font-size: 0.85em; margin-top: 5px; opacity: 0.9;&quot;&gt;All rights reserved&lt;/p&gt;
+    &lt;/footer&gt;
 
-    <script>
+    &lt;script&gt;
         // ========== TAB SWITCHING ==========
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+            document.querySelectorAll(&#x27;.tab-content&#x27;).forEach(tab =&gt; {
+                tab.classList.remove(&#x27;active&#x27;);
             });
             
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+            document.querySelectorAll(&#x27;.tab-btn&#x27;).forEach(btn =&gt; {
+                btn.classList.remove(&#x27;active&#x27;);
             });
             
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add(&#x27;active&#x27;);
+            event.target.classList.add(&#x27;active&#x27;);
         }
 
         // ========== LIPID CALCULATOR (TAB 1) ==========
         
         function loadLipidDatabase() {
-            const savedLipids = localStorage.getItem('lipidDatabase');
+            const savedLipids = localStorage.getItem(&#x27;lipidDatabase&#x27;);
             if (savedLipids) {
                 return JSON.parse(savedLipids);
             }
             return {
-                'Egg PC': 770.00,
-                'POPE': 718.00,
-                'Brain PS': 824.966,
-                'Liver PI': 902.113,
-                'Cholesterol': 386.65,
-                'DGS-NTA Ni': 1004.94,
-                'DOPC': 786.11,
-                'DPPC': 734.04,
-                'POPC': 760.08,
-                'DOPE': 744.03,
-                'Sphingomyelin': 703.00,
-                'Cardiolipin': 1447.97
+                &#x27;Egg PC&#x27;: 770.00,
+                &#x27;POPE&#x27;: 718.00,
+                &#x27;Brain PS&#x27;: 824.966,
+                &#x27;Liver PI&#x27;: 902.113,
+                &#x27;Cholesterol&#x27;: 386.65,
+                &#x27;DGS-NTA Ni&#x27;: 1004.94,
+                &#x27;DOPC&#x27;: 786.11,
+                &#x27;DPPC&#x27;: 734.04,
+                &#x27;POPC&#x27;: 760.08,
+                &#x27;DOPE&#x27;: 744.03,
+                &#x27;Sphingomyelin&#x27;: 703.00,
+                &#x27;Cardiolipin&#x27;: 1447.97
             };
         }
 
         function saveLipidDatabase(database) {
-            localStorage.setItem('lipidDatabase', JSON.stringify(database));
+            localStorage.setItem(&#x27;lipidDatabase&#x27;, JSON.stringify(database));
         }
 
         let lipidDatabase = loadLipidDatabase();
         let lipidCount = 0;
 
         function saveNewLipid() {
-            const name = document.getElementById('newLipidName').value.trim();
-            const mw = parseFloat(document.getElementById('newLipidMW').value);
+            const name = document.getElementById(&#x27;newLipidName&#x27;).value.trim();
+            const mw = parseFloat(document.getElementById(&#x27;newLipidMW&#x27;).value);
 
-            if (!name || !mw || mw <= 0) {
-                alert('Please enter valid lipid name and molecular weight.');
+            if (!name || !mw || mw &lt;= 0) {
+                alert(&#x27;Please enter valid lipid name and molecular weight.&#x27;);
                 return;
             }
 
             if (lipidDatabase[name]) {
-                if (!confirm(`Lipid "${name}" already exists with MW ${lipidDatabase[name]}. Do you want to update it?`)) {
+                if (!confirm(`Lipid &quot;${name}&quot; already exists with MW ${lipidDatabase[name]}. Do you want to update it?`)) {
                     return;
                 }
             }
@@ -663,16 +1266,16 @@
             lipidDatabase[name] = mw;
             saveLipidDatabase(lipidDatabase);
 
-            document.getElementById('newLipidName').value = '';
-            document.getElementById('newLipidMW').value = '';
+            document.getElementById(&#x27;newLipidName&#x27;).value = &#x27;&#x27;;
+            document.getElementById(&#x27;newLipidMW&#x27;).value = &#x27;&#x27;;
 
-            alert(`Lipid "${name}" saved successfully!`);
+            alert(`Lipid &quot;${name}&quot; saved successfully!`);
             updateAllLipidDropdowns();
         }
 
         function updateAllLipidDropdowns() {
-            const selects = document.querySelectorAll('.lipid-select');
-            selects.forEach(select => {
+            const selects = document.querySelectorAll(&#x27;.lipid-select&#x27;);
+            selects.forEach(select =&gt; {
                 const currentValue = select.value;
                 select.innerHTML = getLipidOptions();
                 select.value = currentValue;
@@ -680,35 +1283,35 @@
         }
 
         function getLipidOptions() {
-            let options = '<option value="">Select Lipid</option>';
+            let options = &#x27;&lt;option value=&quot;&quot;&gt;Select Lipid&lt;/option&gt;&#x27;;
             const sortedLipids = Object.keys(lipidDatabase).sort();
             for (let lipid of sortedLipids) {
-                options += `<option value="${lipid}">${lipid} (MW: ${lipidDatabase[lipid]})</option>`;
+                options += `&lt;option value=&quot;${lipid}&quot;&gt;${lipid} (MW: ${lipidDatabase[lipid]})&lt;/option&gt;`;
             }
             return options;
         }
 
         function addLipidRow() {
             lipidCount++;
-            const container = document.getElementById('lipidRows');
-            const row = document.createElement('div');
-            row.className = 'lipid-row';
+            const container = document.getElementById(&#x27;lipidRows&#x27;);
+            const row = document.createElement(&#x27;div&#x27;);
+            row.className = &#x27;lipid-row&#x27;;
             row.id = `lipid-${lipidCount}`;
 
             row.innerHTML = `
-                <div class="input-group">
-                    <label>Lipid</label>
-                    <select class="lipid-select" data-id="${lipidCount}">${getLipidOptions()}</select>
-                </div>
-                <div class="input-group">
-                    <label>Stock (mg/mL)</label>
-                    <input type="number" class="stock-conc" data-id="${lipidCount}" step="0.01" min="0.01">
-                </div>
-                <div class="input-group">
-                    <label>Molar Fraction</label>
-                    <input type="number" class="molar-fraction" data-id="${lipidCount}" step="0.01" min="0" max="1">
-                </div>
-                <button class="remove-btn" onclick="removeLipidRow(${lipidCount})">Remove</button>
+                &lt;div class=&quot;input-group&quot;&gt;
+                    &lt;label&gt;Lipid&lt;/label&gt;
+                    &lt;select class=&quot;lipid-select&quot; data-id=&quot;${lipidCount}&quot;&gt;${getLipidOptions()}&lt;/select&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;input-group&quot;&gt;
+                    &lt;label&gt;Stock (mg/mL)&lt;/label&gt;
+                    &lt;input type=&quot;number&quot; class=&quot;stock-conc&quot; data-id=&quot;${lipidCount}&quot; step=&quot;0.01&quot; min=&quot;0.01&quot;&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;input-group&quot;&gt;
+                    &lt;label&gt;Molar Fraction&lt;/label&gt;
+                    &lt;input type=&quot;number&quot; class=&quot;molar-fraction&quot; data-id=&quot;${lipidCount}&quot; step=&quot;0.01&quot; min=&quot;0&quot; max=&quot;1&quot;&gt;
+                &lt;/div&gt;
+                &lt;button class=&quot;remove-btn&quot; onclick=&quot;removeLipidRow(${lipidCount})&quot;&gt;Remove&lt;/button&gt;
             `;
             container.appendChild(row);
         }
@@ -721,35 +1324,35 @@
         function showError(message, type) {
             const errorDiv = document.getElementById(`error-${type}`);
             errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            document.getElementById(`results-${type}`).style.display = 'none';
+            errorDiv.style.display = &#x27;block&#x27;;
+            document.getElementById(`results-${type}`).style.display = &#x27;none&#x27;;
         }
 
         function hideError(type) {
-            document.getElementById(`error-${type}`).style.display = 'none';
+            document.getElementById(`error-${type}`).style.display = &#x27;none&#x27;;
         }
 
         function calculateLipidVolumes() {
-            hideError('lipid');
+            hideError(&#x27;lipid&#x27;);
 
-            const totalVolume = parseFloat(document.getElementById('totalVolume').value);
-            const concentration = parseFloat(document.getElementById('concentration').value);
+            const totalVolume = parseFloat(document.getElementById(&#x27;totalVolume&#x27;).value);
+            const concentration = parseFloat(document.getElementById(&#x27;concentration&#x27;).value);
 
             if (!totalVolume || !concentration) {
-                showError('Please enter valid solution parameters.', 'lipid');
+                showError(&#x27;Please enter valid solution parameters.&#x27;, &#x27;lipid&#x27;);
                 return;
             }
 
             const lipids = [];
-            const lipidSelects = document.querySelectorAll('.lipid-select');
+            const lipidSelects = document.querySelectorAll(&#x27;.lipid-select&#x27;);
             
-            lipidSelects.forEach(select => {
+            lipidSelects.forEach(select =&gt; {
                 const id = select.dataset.id;
                 const lipidName = select.value;
-                const stockConc = parseFloat(document.querySelector(`.stock-conc[data-id="${id}"]`).value);
-                const molarFraction = parseFloat(document.querySelector(`.molar-fraction[data-id="${id}"]`).value);
+                const stockConc = parseFloat(document.querySelector(`.stock-conc[data-id=&quot;${id}&quot;]`).value);
+                const molarFraction = parseFloat(document.querySelector(`.molar-fraction[data-id=&quot;${id}&quot;]`).value);
 
-                if (lipidName && stockConc && molarFraction) {
+                if (lipidName &amp;&amp; stockConc &amp;&amp; molarFraction) {
                     lipids.push({
                         name: lipidName,
                         mw: lipidDatabase[lipidName],
@@ -760,23 +1363,23 @@
             });
 
             if (lipids.length === 0) {
-                showError('Please add at least one lipid with all required information.', 'lipid');
+                showError(&#x27;Please add at least one lipid with all required information.&#x27;, &#x27;lipid&#x27;);
                 return;
             }
 
-            const totalFraction = lipids.reduce((sum, l) => sum + l.molarFraction, 0);
-            if (Math.abs(totalFraction - 1.0) > 0.001) {
-                showError(`Molar fractions must sum to 1.0 (current sum: ${totalFraction.toFixed(3)})`, 'lipid');
+            const totalFraction = lipids.reduce((sum, l) =&gt; sum + l.molarFraction, 0);
+            if (Math.abs(totalFraction - 1.0) &gt; 0.001) {
+                showError(`Molar fractions must sum to 1.0 (current sum: ${totalFraction.toFixed(3)})`, &#x27;lipid&#x27;);
                 return;
             }
 
-            const avgMW = lipids.reduce((sum, l) => sum + (l.molarFraction * l.mw), 0);
+            const avgMW = lipids.reduce((sum, l) =&gt; sum + (l.molarFraction * l.mw), 0);
             const totalMassMg = concentration * (totalVolume / 1000);
             const totalMassUg = totalMassMg * 1000;
             const totalMolesMmol = totalMassMg / avgMW;
             const totalMoles = totalMolesMmol * 1000;
 
-            const results = lipids.map(lipid => {
+            const results = lipids.map(lipid =&gt; {
                 const moles = lipid.molarFraction * totalMoles;
                 const molesInMmol = moles / 1000;
                 const massInMg = molesInMmol * lipid.mw;
@@ -792,40 +1395,40 @@
                 };
             });
 
-            const totalLipidVolume = results.reduce((sum, r) => sum + r.volume, 0);
+            const totalLipidVolume = results.reduce((sum, r) =&gt; sum + r.volume, 0);
             const chloroformVolume = totalVolume - totalLipidVolume;
 
             displayLipidResults(results, chloroformVolume, totalLipidVolume, avgMW);
         }
 
         function displayLipidResults(lipidResults, chloroformVolume, totalLipidVolume, avgMW) {
-            const resultsDiv = document.getElementById('results-lipid');
-            let html = '<div class="section-title">📊 Calculated Volumes</div>';
+            const resultsDiv = document.getElementById(&#x27;results-lipid&#x27;);
+            let html = &#x27;&lt;div class=&quot;section-title&quot;&gt;📊 Calculated Volumes&lt;/div&gt;&#x27;;
             
-            html += `<div class="result-item">
-                <span class="result-label">Average Molecular Weight:</span>
-                <span class="result-value">${avgMW.toFixed(2)} g/mol</span>
-            </div>`;
+            html += `&lt;div class=&quot;result-item&quot;&gt;
+                &lt;span class=&quot;result-label&quot;&gt;Average Molecular Weight:&lt;/span&gt;
+                &lt;span class=&quot;result-value&quot;&gt;${avgMW.toFixed(2)} g/mol&lt;/span&gt;
+            &lt;/div&gt;`;
 
-            lipidResults.forEach(result => {
-                html += `<div class="result-item">
-                    <span class="result-label">${result.name}:</span>
-                    <span class="result-value">${result.volume.toFixed(1)} μL</span>
-                </div>`;
+            lipidResults.forEach(result =&gt; {
+                html += `&lt;div class=&quot;result-item&quot;&gt;
+                    &lt;span class=&quot;result-label&quot;&gt;${result.name}:&lt;/span&gt;
+                    &lt;span class=&quot;result-value&quot;&gt;${result.volume.toFixed(1)} μL&lt;/span&gt;
+                &lt;/div&gt;`;
             });
 
-            html += `<div class="result-item">
-                <span class="result-label">Total Lipid Stock Volume:</span>
-                <span class="result-value">${totalLipidVolume.toFixed(1)} μL</span>
-            </div>`;
+            html += `&lt;div class=&quot;result-item&quot;&gt;
+                &lt;span class=&quot;result-label&quot;&gt;Total Lipid Stock Volume:&lt;/span&gt;
+                &lt;span class=&quot;result-value&quot;&gt;${totalLipidVolume.toFixed(1)} μL&lt;/span&gt;
+            &lt;/div&gt;`;
 
-            html += `<div class="result-item chloroform-result">
-                <span class="result-label">Chloroform:</span>
-                <span class="result-value">${chloroformVolume.toFixed(1)} μL</span>
-            </div>`;
+            html += `&lt;div class=&quot;result-item chloroform-result&quot;&gt;
+                &lt;span class=&quot;result-label&quot;&gt;Chloroform:&lt;/span&gt;
+                &lt;span class=&quot;result-value&quot;&gt;${chloroformVolume.toFixed(1)} μL&lt;/span&gt;
+            &lt;/div&gt;`;
 
             resultsDiv.innerHTML = html;
-            resultsDiv.style.display = 'block';
+            resultsDiv.style.display = &#x27;block&#x27;;
         }
 
         // ========== PROTEIN RECONSTITUTION CALCULATOR (TAB 2) ==========
@@ -833,26 +1436,29 @@
         const AVOGADRO = 6.022e23;
 
         function updateLipidMW() {
-            const lipidType = document.getElementById('lipidType');
-            document.getElementById('lipidMW').value = lipidType.value;
+            const lipidType = document.getElementById(&#x27;lipidType&#x27;);
+            document.getElementById(&#x27;lipidMW&#x27;).value = lipidType.value;
         }
 
         function toggleMCT() {
-            const includeMCT = document.getElementById('includeMCT').checked;
-            const mctVolumeInput = document.getElementById('mctVolume');
-            const lipidVolumeInput = document.getElementById('lipidVolume');
+            const includeMCT = document.getElementById(&#x27;includeMCT&#x27;).checked;
+            const mctVolumeInput = document.getElementById(&#x27;mctVolume&#x27;);
+            const lipidVolumeInput = document.getElementById(&#x27;lipidVolume&#x27;);
             
             if (!includeMCT) {
                 const currentLipid = parseFloat(lipidVolumeInput.value);
                 const currentMCT = parseFloat(mctVolumeInput.value);
                 lipidVolumeInput.value = currentLipid + currentMCT;
                 mctVolumeInput.disabled = true;
-                document.getElementById('lipidMCTRatio').disabled = true;
+                document.getElementById(&#x27;lipidMCTRatio&#x27;).disabled = true;
             } else {
                 mctVolumeInput.disabled = false;
-                document.getElementById('lipidMCTRatio').disabled = false;
+                document.getElementById(&#x27;lipidMCTRatio&#x27;).disabled = false;
             }
         }
 
         function calculateProteinConcentrations() {
-            hideError('protein');
+            hideError(&#x27;protein&#x27;);"></iframe>
+</div>
+</body>
+</html>
